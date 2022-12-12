@@ -11,10 +11,17 @@
 </head>
 
 <body>
-  <div id="container">
-    <div class="actionsButtons"><button id="btn-voltar">Voltar</button><button
-        id="btn-inicio-pause">Iniciar</button><button id="btn-avancar">Avançar</button></div>
+  <input type="checkbox" id="checkboxDiff" name="diff">
+  <label for="checkboxDiff">Mostrar somente diferença</label>
+
+  <div class="actionsButtons" id="containerBtn">
+    <button id="btn-voltar" disabled>Voltar</button>
+    <button id="btn-inicio-pause">Iniciar</button>
+    <button id="btn-avancar" disabled>Avançar</button>
   </div>
+  </div>
+  <div id="containerFullList"></div>
+  <div id="containerFilteredList"></div>
 </body>
 
 </html>
