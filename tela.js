@@ -116,7 +116,7 @@ const criarTabelaDiferenca = (container, vetorDiferenca) => {
   tabela.appendChild(criarTabelaBodyDiferenca(vetorDiferenca));
   container.appendChild(tabela);
 };
-const criarTabelaHeaderDiferenca = () => {
+const createTableHeader = () => {
   return `
  <thead>
     <th>Log</th>
@@ -124,35 +124,24 @@ const criarTabelaHeaderDiferenca = () => {
     <th>Valor</th>
 </thead>`;
 };
-const criarTabelaBodyDiferenca = (vetorDiferenca) => {
+const createTableBody = (arrayDiff) => {
   let tBody = document.createElement("tbody");
-  let obj1 = vetorDiferenca[0];
-  let obj2 = vetorDiferenca[1];
+  let obj1 = arrayDiff[0];
+  let obj2 = arrayDiff[1];
   tBody.innerHTML += `
     <tr>
     <td>Log ${obj1.Objeto}</td>
     <td>${obj1.key}</td>
-    <td>${preencheValor(obj1?.xValue, obj2?.yValue)}</td>
+    <td>${highlight(obj1?.xValue ?? "", obj2?.yValue ?? "")}</td>
     </tr>
     <tr>
     <td>Log ${obj2.Objeto}</td>
     <td>${obj2.key}</td>
-    <td>${preencheValor(obj2?.yValue, obj1?.xValue)}</td>
+    <td>${highlight(obj2?.yValue ?? "", obj1?.xValue ?? "")}</td>
     </tr>
   `;
   return tBody;
 };
-const preencheValor = (log1, log2) => {
-  if (log1 == undefined) {
-    log1 = "";
-  }
-  else if (log2 == undefined) {
-    log2 = "";
-  }
-  return highlightString(log1, log2)
-}
-//
-//funcoes que envolvem css
 /*https://stackoverflow.com/questions/38037163/how-to-highlight-the-difference-of-two-texts-with-css*/
 function highlightHTML(newElem, oldElem) {
   var oldText = oldElem.innerText,
