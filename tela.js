@@ -6,28 +6,54 @@ const containerDivAll = document.getElementById("containerFullList");
 const containerDivFiltered = document.getElementById("containerFilteredList");
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetchData();
   document.getElementById('btn-inicio-pause').addEventListener("click", btnInicioPauseEvento);
   document.getElementById('btn-avancar').addEventListener("click", btnAvancarEvento);
   document.getElementById('btn-voltar').addEventListener("click", btnVoltarEvento);
   document.getElementById('checkboxDiff').addEventListener("click", handleChange);
+  document.getElementById('inputFile').addEventListener("change", handleInput, false)
 });
+function handleInput(event) {
+  const fileList = this.files;
+  let reader = new FileReader()
+  reader.onload = function () {
+    let fileContent = JSON.parse(reader.result);
+    if (fileContent.length != 2) {
+      console.log('Formato invalido');
+    } else {
+      resetTableDiv();
+      let vetorDiferenca = verificaIgualdade(fileContent[0], fileContent[1]);
+      let infoText = document.getElementById('InfoText');
+      if (vetorDiferenca.length == 0) {
+        containerMain.style.display = "none"
+        infoText.innerHTML = "Nenhuma diferença";
+      } else {
+        infoText.innerHTML = `Foram encontradas ${vetorDiferenca.length} diferenças`;
+        let mapDifferenceObj1 = new Map();
+        let mapDifferenceObj2 = new Map();
+        vetorDiferenca.forEach((item) => {
+          mapDifferenceObj1.set(item[0].key, item[0]);
+          mapDifferenceObj2.set(item[1].key, item[1]);
+          criarTabelaDiferenca(containerDivFiltered, item);
+        })
+        criarTabela(containerDivAll, Object.entries(fileContent[0]), mapDifferenceObj1);
+        criarTabela(containerDivAll, Object.entries(fileContent[1]), mapDifferenceObj2);
+      }
+    }
 
-async function fetchData() {
-  let responseProduto = await fetch("./exemplo_json.json");
-  let json = await responseProduto.json();
-  let vetorDiferenca = verificaIgualdade(json[0], json[1]);
-  let mapDifferenceObj1 = new Map();
-  let mapDifferenceObj2 = new Map();
-  vetorDiferenca.forEach((item) => {
-    mapDifferenceObj1.set(item[0].key, item[0]);
-    mapDifferenceObj2.set(item[1].key, item[1]);
-    criarTabelaDiferenca(containerDivFiltered, item);
-  })
-  criarTabela(containerDivAll, Object.entries(json[0]), mapDifferenceObj1);
-  criarTabela(containerDivAll, Object.entries(json[1]), mapDifferenceObj2);
+  }
+  reader.readAsText(fileList[0]);
+
 }
-
+const resetTableDiv = () => {
+  let [tbl1, tbl2] = document.querySelectorAll('.tbl');
+  let containerMain = document.getElementById('containerMain');
+  selectedIndex = 0;
+  posicaoTabelaSet.clear();
+  containerDivFiltered.innerHTML = ""
+  containerMain.style.display = "flex"
+  tbl1?.remove();
+  tbl2?.remove();
+}
 //eventos 
 const btnAvancarEvento = (event) => {
   if (selectedIndex < posicaoTabelaSet.size - 1) {
@@ -112,8 +138,8 @@ const criarTabelaDiferenca = (container, vetorDiferenca) => {
   let tabela = document.createElement("table");
   tabela.className = "tbl";
   tabela.setAttribute("border", 2);
-  tabela.innerHTML = criarTabelaHeaderDiferenca();
-  tabela.appendChild(criarTabelaBodyDiferenca(vetorDiferenca));
+  tabela.innerHTML = createTableHeader();
+  tabela.appendChild(createTableBody(vetorDiferenca));
   container.appendChild(tabela);
 };
 const createTableHeader = () => {
@@ -132,12 +158,12 @@ const createTableBody = (arrayDiff) => {
     <tr>
     <td>Log ${obj1.Objeto}</td>
     <td>${obj1.key}</td>
-    <td>${highlight(obj1?.xValue ?? "", obj2?.yValue ?? "")}</td>
+    <td>${highlightString(obj1?.xValue ?? "", obj2?.yValue ?? "")}</td>
     </tr>
     <tr>
     <td>Log ${obj2.Objeto}</td>
     <td>${obj2.key}</td>
-    <td>${highlight(obj2?.yValue ?? "", obj1?.xValue ?? "")}</td>
+    <td>${highlightString(obj2?.yValue ?? "", obj1?.xValue ?? "")}</td>
     </tr>
   `;
   return tBody;
